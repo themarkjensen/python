@@ -60,7 +60,7 @@ class xml2csv_symmetrize:
 		"""
 
 		# get to the root
-		event, root = self.context.next()
+		event, root = self.context.__next__()
 
 		items = []
 		header_line = []
@@ -208,7 +208,7 @@ def perf_func(elem, func, level=0, xml_struct=[], dict_tags={}):
 
 def print_level(elem,level,xml_struct,dict_tags):
 	if elem.tag not in dict_tags:
-		print '-\t'*level+elem.tag
+		print('-\t'*level+elem.tag)
 		dict_tags[elem.tag] = level
 	xml_struct.append([level,elem.tag])
 
@@ -222,7 +222,7 @@ def iterTag(path_to_file):
 
 ## Function for executing the Symmetrize operation and for generating an XML preview
 def symmetrize(xml_file):
-	print "\nGenerating preview of XML structure...\n"
+	print("\nGenerating preview of XML structure...\n")
 	xml_struct, dictionary_tags = iterTag(xml_file)
 	return xml_struct, dictionary_tags
 
@@ -230,7 +230,7 @@ def symmetrize(xml_file):
 ## Function for retrieving arguments from the user
 
 def get_user_input(prompt_message):
-	ri = raw_input("\n" + prompt_message + "\n\n")
+	ri = input("\n" + prompt_message + "\n\n")
 	return ri
 
 
@@ -253,7 +253,7 @@ if __name__ == "__main__":
 		\n\n
 		"""
 
-		print usage
+		print(usage)
 
 		parser = OptionParser(usage, version='1')
 		parser.add_option("-t", "--tag", action="store", type="string", dest="tag")
@@ -272,13 +272,13 @@ if __name__ == "__main__":
 			input_file = args[0]
 			output_file = args[1]
 		else:
-			print "\nThis script takes 2 arg. %d args provided.\n" % len(args)
-			print usage
+			print("\nThis script takes 2 arg. " + len(args) + " args provided.\n")
+			print(usage)
 			sys.exit(1)
 
 ## Get the XML content and move it to the output directory
 		if input_file.find('http') != -1:
-			print "\nDownloading file %s\n" % input_file
+			print("\nDownloading file " + input_file + "\n")
 			dtNow = datetime.datetime.now().strftime("%m-%d-%Y %I.%M.%S %p")
 			if output_file == "output_file":
 				local_dir = input_file[input_file.rfind('/')+1:input_file.rfind('.')]
@@ -291,7 +291,7 @@ if __name__ == "__main__":
 			handle = open(local_dir + '/' + local_input_file, 'wb')
 			response = requests.get(input_file, stream=True)
 			if not response.ok:  # Something went wrong
-				print "\nURL response error. Check the URL.\n"
+				print("\nURL response error. Check the URL.\n")
 				sys.exit(1)
 			pInd = ProgressIndicator(label="Downloading file: %(value)dKB - ")
 			szb = 0
@@ -305,7 +305,7 @@ if __name__ == "__main__":
 			handle.close()
 			pInd.maxval = szk
 			pInd.finish()
-			print "\n%s downloaded successfully!\n" % local_input_file
+			print("\n" + local_input_file + " downloaded successfully!\n")
 		elif input_file.find('/') != -1:
 			dtNow = datetime.datetime.now().strftime("%m-%d-%Y %I.%M.%S %p")
 			if output_file == "output_file":
@@ -314,7 +314,7 @@ if __name__ == "__main__":
 				local_dir = output_file
 			local_input_file = local_dir + ' - ' + dtNow + '.xml'
 			csv_file = local_dir + ' - ' + dtNow + '.csv'
-			print "Copying %s to new directory" % local_input_file
+			print("Copying " + local_input_file + " to new directory")
 			in_file = open(input_file, 'rb')
 			input_file_content = in_file.read()
 			if not os.path.exists(local_dir):
@@ -331,7 +331,7 @@ if __name__ == "__main__":
 				local_dir = output_file
 			local_input_file = local_dir + ' - ' + dtNow + '.xml'
 			csv_file = local_dir + ' - ' + dtNow + '.csv'
-			print "\nCopying %s to new directory\n" % local_input_file
+			print("\nCopying " + local_input_file + " to new directory\n")
 			in_file = open(input_file, 'rb')
 			input_file_content = in_file.read()
 			if not os.path.exists(local_dir):
@@ -358,9 +358,9 @@ if __name__ == "__main__":
 		if options.ignore is None:
 			ignore_prompt = "Which XML element(s) should be excluded from the CSV file output? List element(s) separated by commas (,)."
 			exclusions = get_user_input(ignore_prompt)
-			lsExclusions = string.split(exclusions, ',')
+			lsExclusions = exclusions.split(',')
 		else:
-			lsExclusions = string.split(options.ignore, ',')
+			lsExclusions = options.ignore.split(',')
 
 		if options.sample is None:
 			sample_prompt = "If only a sample is desired, enter the max number of rows. For all rows, enter 'n'."
@@ -371,7 +371,7 @@ if __name__ == "__main__":
 				try:
 					sample = int(sample)
 				except:
-					print "Please provide only an integer or 'n' for the sample size."
+					print("Please provide only an integer or 'n' for the sample size.")
 					sys.exit(1)
 		elif options.sample == 'n':
 			sample = None
@@ -379,7 +379,7 @@ if __name__ == "__main__":
 			try:
 				sample = int(options.sample)
 			except:
-				print "Please provide only an integer or 'n' for the sample size."
+				print("Please provide only an integer or 'n' for the sample size.")
 				sys.exit(1)
 
 		if options.symmetrize:
@@ -417,11 +417,11 @@ if __name__ == "__main__":
 
 		#### Do the conversion from XML to CSV
 
-		print "\nConverting %s to %s based on '%s' as row identifier...\n" % (local_input_file, csv_file, xml_row)
+		print("\nConverting " + local_input_file + " to " + csv_file + " based on '" + xml_row + "' as row identifier...\n")
 
 		## Enter status bar
 		converter = xml2csv_symmetrize(local_dir + '/' + local_input_file, local_dir + '/' + csv_file, encoding="utf-8")
 		converter.convert(tag=xml_row, ignore=lsExclusions, limit=sample, headers_list=headers_list, row_count=row_count)
-		print "\n%s ---> %s -- Conversion Successful!\n" % (local_input_file, csv_file)
+		print("\n" + local_input_file + " ---> " + csv_file + " -- Conversion Successful!\n")
 
 	main()
